@@ -2,7 +2,9 @@
   "version": 2,
   "functions": {
     "api/index.js": {
-      "maxDuration": 30
+      "maxDuration": 25,
+      "memory": 1024,
+      "runtime": "nodejs18.x"
     }
   },
   "rewrites": [
@@ -13,21 +15,41 @@
   ],
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/api/(.*)",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
           "value": "*"
         },
         {
-          "key": "Access-Control-Allow-Methods", 
-          "value": "GET, POST, PUT, DELETE, OPTIONS"
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, OPTIONS"
         },
         {
           "key": "Access-Control-Allow-Headers",
-          "value": "X-Requested-With, Content-Type, Accept, Authorization"
+          "value": "Content-Type, Authorization"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, s-maxage=600"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
         }
       ]
     }
-  ]
+  ],
+  "regions": ["iad1", "lhr1", "sfo1"],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
