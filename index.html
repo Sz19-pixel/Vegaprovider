@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -542,12 +541,12 @@
     </div>
 
     <script>
-         // Get current domain for the addon URL
-        const currentDomain = window.location.origin;
-        const addonUrl = `https://${window.location.host}/manifest.json`;
-const stremioInstallUrl = `stremio://${addonUrl}`;
-        // Set the install button URL
-        document.getElementById('installBtn').href = stremioInstallUrl;
+        // Get the correct domain and manifest URL
+        const manifestUrl = `${window.location.origin}/manifest.json`;
+        const stremioInstallUrl = `stremio://${window.location.host}/manifest.json`;
+
+        console.log('Manifest URL:', manifestUrl);
+        console.log('Stremio Install URL:', stremioInstallUrl);
 
         // Set the install button URL
         document.getElementById('installBtn').href = stremioInstallUrl;
@@ -561,14 +560,14 @@ const stremioInstallUrl = `stremio://${addonUrl}`;
             
             // Fallback: copy link and show instructions
             setTimeout(() => {
-                copyToClipboard(addonUrl);
+                copyToClipboard(manifestUrl);
                 showNotification('Addon link copied! Paste it in Stremio if the app didn\'t open.');
             }, 1000);
         });
 
         // Copy link function
         function copyLink() {
-            copyToClipboard(addonUrl);
+            copyToClipboard(manifestUrl);
             showNotification('Addon link copied to clipboard!');
         }
 
@@ -606,7 +605,7 @@ const stremioInstallUrl = `stremio://${addonUrl}`;
         // Report issue function
         function reportIssue() {
             const subject = encodeURIComponent('Multi-Source Streams Pro - Issue Report');
-            const body = encodeURIComponent(`Please describe the issue you're experiencing with the Multi-Source Streams Pro addon:\n\nAddon URL: ${addonUrl}\nBrowser: ${navigator.userAgent}\n\nIssue Description:\n`);
+            const body = encodeURIComponent(`Please describe the issue you're experiencing with the Multi-Source Streams Pro addon:\n\nAddon URL: ${manifestUrl}\nBrowser: ${navigator.userAgent}\n\nIssue Description:\n`);
             
             // You can replace this with your actual support email
             window.open(`mailto:support@example.com?subject=${subject}&body=${body}`);
@@ -658,7 +657,7 @@ const stremioInstallUrl = `stremio://${addonUrl}`;
 
         // Console welcome message
         console.log('%c🎬 Multi-Source Streams Pro', 'color: #667eea; font-size: 20px; font-weight: bold;');
-        console.log('%cAddon URL: ' + addonUrl, 'color: #764ba2; font-size: 14px;');
+        console.log('%cAddon URL: ' + manifestUrl, 'color: #764ba2; font-size: 14px;');
         console.log('%cFor support, please use the Report Issue button', 'color: #666; font-size: 12px;');
     </script>
 </body>
