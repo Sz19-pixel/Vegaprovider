@@ -1,9 +1,7 @@
-// api/index.js - Vercel API Route
 const { addonBuilder } = require('stremio-addon-sdk');
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-// Addon manifest
 const manifest = {
     id: 'community.vegamovies',
     version: '1.0.0',
@@ -47,7 +45,6 @@ const manifest = {
     idPrefixes: ['vegamovies:', 'luxmovies:', 'rogmovies:']
 };
 
-// Provider configurations
 const providers = {
     vegamovies: {
         baseUrl: 'https://vegamovies.yoga',
@@ -66,7 +63,6 @@ const providers = {
     }
 };
 
-// HTTP headers for requests
 const headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
     'Accept-Language': 'en-US,en;q=0.9',
@@ -74,12 +70,10 @@ const headers = {
     'Cache-Control': 'no-cache'
 };
 
-// Cache for dynamic URLs
 let urlCache = {};
 let cacheTimestamp = 0;
-const CACHE_DURATION = 3600000; // 1 hour
+const CACHE_DURATION = 3600000;
 
-// Function to get dynamic URLs
 async function getDynamicUrls() {
     const now = Date.now();
     if (urlCache && Object.keys(urlCache).length > 0 && (now - cacheTimestamp) < CACHE_DURATION) {
@@ -99,13 +93,11 @@ async function getDynamicUrls() {
     }
 }
 
-// Function to get the actual base URL for a provider
 async function getProviderUrl(providerKey) {
     const dynamicUrls = await getDynamicUrls();
     return dynamicUrls[providers[providerKey].urlKey] || providers[providerKey].baseUrl;
 }
 
-// Function to scrape catalog items
 async function scrapeCatalog(providerKey, type, page = 1) {
     try {
         const baseUrl = await getProviderUrl(providerKey);
@@ -121,11 +113,7 @@ async function scrapeCatalog(providerKey, type, page = 1) {
                 : `${baseUrl}/page/${page}/`;
         }
 
-        const response = await axios.get(url, {
-            headers,
-            timeout: 15000
-        });
-
+        const response = await axios.get(url, { headers, timeout: 15000 });
         const $ = cheerio.load(response.data);
         const items = [];
 
@@ -135,11 +123,9 @@ async function scrapeCatalog(providerKey, type, page = 1) {
                 const title = $el.find('h2 > a').text().replace('Download ', '').trim();
                 const href = $el.find('a').attr('href');
                 let posterUrl = $el.find('img').attr('src');
-                
                 if (posterUrl && posterUrl.includes('data:image')) {
                     posterUrl = $el.find('img').attr('data-lazy-src');
                 }
-
                 if (title && href) {
                     items.push({
                         id: `${providerKey}:${Buffer.from(href).toString('base64')}`,
@@ -157,7 +143,6 @@ async function scrapeCatalog(providerKey, type, page = 1) {
                 const title = $el.attr('title')?.replace('Download ', '').trim();
                 const href = $el.attr('href');
                 let posterUrl = $el.find('img').attr('data-src') || $el.find('img').attr('src');
-
                 if (title && href) {
                     items.push({
                         id: `${providerKey}:${Buffer.from(href).toString('base64')}`,
@@ -178,31 +163,20 @@ async function scrapeCatalog(providerKey, type, page = 1) {
     }
 }
 
-// Function to get meta information
 async function getMeta(id) {
     try {
         const [providerKey, encodedUrl] = id.split(':');
         const url = Buffer.from(encodedUrl, 'base64').toString();
-        
-        const response = await axios.get(url, {
-            headers,
-            timeout: 15000
-        });
-
+        const response = await axios.get(url, { headers, timeout: 15000 });
         const $ = cheerio.load(response.data);
-        
         let title = $('meta[property="og:title"]').attr('content')?.replace('Download ', '') || '';
         const posterUrl = $('meta[property="og:image"]').attr('content');
         const div = $('.entry-content, .entry-inner').first();
         let description = div.find('h3:contains("SYNOPSIS"), h4:contains("SYNOPSIS"), h3:contains("PLOT"), h4:contains("PLOT")').next().text();
-        
         const imdbUrl = div.find('a:contains("Rating")').attr('href');
         const heading = div.find('h3 > strong > span').text();
-        
         const isSeries = heading.includes('Series') || heading.includes('SHOW');
         const type = isSeries ? 'series' : 'movie';
-
-        // Try to get IMDB data
         let imdbData = null;
         if (imdbUrl) {
             const imdbId = imdbUrl.split('title/')[1]?.split('/')[0];
@@ -250,37 +224,25 @@ async function getMeta(id) {
     }
 }
 
-// Function to extract streaming links
 async function getStreams(id) {
     try {
         const [providerKey, encodedUrl, season, episode] = id.split(':');
         const url = Buffer.from(encodedUrl, 'base64').toString();
-        
-        const response = await axios.get(url, {
-            headers,
-            timeout: 15000
-        });
-
+        const response = await axios.get(url, { headers, timeout: 15000 });
         const $ = cheerio.load(response.data);
         const streams = [];
-
-        // Check if it's a series or movie
         const heading = $('.entry-content, .entry-inner').find('h3 > strong > span').text();
         const isSeries = heading.includes('Series') || heading.includes('SHOW');
 
         if (isSeries && season && episode) {
-            // Handle series episodes
             const hTags = $('.entry-content, .entry-inner').find('h3:contains("4K"), h3:contains("1080p"), h3:contains("720p"), h3:contains("480p"), h5:contains("4K"), h5:contains("1080p"), h5:contains("720p"), h5:contains("480p")');
-            
             for (let i = 0; i < hTags.length; i++) {
                 const tag = $(hTags[i]);
                 const seasonMatch = tag.text().match(/(?:Season |S)(\d+)/);
                 const tagSeason = seasonMatch ? parseInt(seasonMatch[1]) : 1;
-                
                 if (tagSeason === parseInt(season)) {
                     const pTag = tag.next('p');
                     const aTags = pTag.length ? pTag.find('a') : tag.find('a');
-                    
                     const downloadLink = aTags.filter((j, el) => {
                         const text = $(el).text();
                         return text.includes('V-Cloud') || text.includes('Episode') || text.includes('Download');
@@ -291,11 +253,8 @@ async function getStreams(id) {
                         if (linkUrl) {
                             try {
                                 const linkResponse = await axios.get(linkUrl, { headers, timeout: 10000 });
-                                
-                                // Extract various streaming links
                                 const vcloudRegex = /https:\/\/vcloud\.lol\/[^\s"]+/g;
                                 const fastdlRegex = /https:\/\/fastdl\.icu\/embed\?download=[a-zA-Z0-9]+/g;
-                                
                                 let matches = linkResponse.data.match(vcloudRegex) || [];
                                 if (matches.length === 0) {
                                     matches = linkResponse.data.match(fastdlRegex) || [];
@@ -322,17 +281,14 @@ async function getStreams(id) {
                 }
             }
         } else {
-            // Handle movies
             const buttons = $('p > a:has(button)');
             for (let i = 0; i < buttons.length; i++) {
                 const button = $(buttons[i]);
                 const linkUrl = button.attr('href');
-                
                 if (linkUrl) {
                     try {
                         const linkResponse = await axios.get(linkUrl, { headers, timeout: 10000 });
                         const link$ = cheerio.load(linkResponse.data);
-                        
                         const vcloudLink = link$('a:contains("V-Cloud")').attr('href');
                         if (vcloudLink) {
                             streams.push({
@@ -358,15 +314,12 @@ async function getStreams(id) {
     }
 }
 
-// Create addon builder
 const builder = new addonBuilder(manifest);
 
-// Catalog handler
 builder.defineCatalogHandler(async (args) => {
     const { type, id, extra } = args;
     const skip = parseInt(extra?.skip) || 0;
     const page = Math.floor(skip / 20) + 1;
-    
     let providerKey;
     if (id.includes('vegamovies')) providerKey = 'vegamovies';
     else if (id.includes('luxmovies')) providerKey = 'luxmovies';
@@ -377,44 +330,32 @@ builder.defineCatalogHandler(async (args) => {
     return { metas: items };
 });
 
-// Meta handler
 builder.defineMetaHandler(async (args) => {
     const { id } = args;
     const meta = await getMeta(id);
     return meta ? { meta } : { meta: null };
 });
 
-// Stream handler
 builder.defineStreamHandler(async (args) => {
     const { id } = args;
     const streams = await getStreams(id);
     return { streams };
 });
 
-const addonInterface = builder.getInterface();
+const { handler } = builder.getInterface();
 
-// Vercel serverless function handler
 module.exports = async (req, res) => {
-    // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    
+
     if (req.method === 'OPTIONS') {
         res.status(200).end();
         return;
     }
-    
+
     try {
-        const result = await addonInterface(req);
-        
-        // Set content type for JSON responses
-        if (result && typeof result === 'object') {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200).json(result);
-        } else {
-            res.status(404).json({ error: 'Not found' });
-        }
+        await handler(req, res);
     } catch (error) {
         console.error('Error handling request:', error);
         res.status(500).json({ error: 'Internal Server Error' });
