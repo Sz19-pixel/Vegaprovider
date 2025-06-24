@@ -1,46 +1,55 @@
-// server.js - Local development server
-const { addonBuilder } = require('stremio-addon-sdk');
-const addonInterface = require('./api/index.js').default;
+// server.js - Fixed Local development server
+import { createServer } from 'http';
+import { URL } from 'url';
+import addonHandler from './api/index.js';
 
 const PORT = process.env.PORT || 3000;
 
-// Create a simple HTTP server for local development
-const http = require('http');
-const url = require('url');
-
-const server = http.createServer(async (req, res) => {
-    const parsedUrl = url.parse(req.url, true);
+const server = createServer(async (req, res) => {
+    console.log(`${req.method} ${req.url}`);
     
-    // Create a mock Vercel-like request object
+    // Create mock Vercel request/response objects
     const mockReq = {
         method: req.method,
         url: req.url,
-        query: parsedUrl.query,
         headers: req.headers,
-        body: req.body
+        query: new URL(req.url, `http://localhost:${PORT}`).searchParams
     };
     
-    // Create a mock Vercel-like response object
     const mockRes = {
-        setHeader: (key, value) => res.setHeader(key, value),
-        status: (code) => {
+        _statusCode: 200,
+        _headers: {},
+        setHeader(key, value) {
+            this._headers[key] = value;
+            res.setHeader(key, value);
+        },
+        status(code) {
+            this._statusCode = code;
             res.statusCode = code;
-            return mockRes;
+            return this;
         },
-        json: (data) => {
+        json(data) {
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(data));
+            res.end(JSON.stringify(data, null, 2));
         },
-        end: () => res.end()
+        end(data) {
+            if (data) res.write(data);
+            res.end();
+        }
     };
     
     try {
-        await addonInterface(mockReq, mockRes);
+        await addonHandler(mockReq, mockRes);
     } catch (error) {
         console.error('Server error:', error);
-        res.statusCode = 500;
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+        if (!res.headersSent) {
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ 
+                error: 'Internal Server Error',
+                message: error.message 
+            }));
+        }
     }
 });
 
@@ -48,4 +57,26 @@ server.listen(PORT, () => {
     console.log(`🚀 Stremio addon server running on port ${PORT}`);
     console.log(`📺 Manifest URL: http://localhost:${PORT}/manifest.json`);
     console.log(`🔗 Install URL: stremio://localhost:${PORT}/manifest.json`);
+    console.log('');
+    console.log('Available endpoints:');
+    console.log(`  GET /manifest.json - Addon manifest`);
+    console.log(`  GET /stream/movie/{imdb_id} - Movie streams`);
+    console.log(`  GET /stream/series/{imdb_id}:{season}:{episode} - TV series streams`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+    });
+});
+
+process.on('SIGINT', () => {
+    console.log('SIGINT received, shutting down gracefully');
+    server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+    });
 });
