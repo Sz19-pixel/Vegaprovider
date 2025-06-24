@@ -542,10 +542,13 @@
     </div>
 
     <script>
-        // Get current domain for the addon URL
+         // Get current domain for the addon URL
         const currentDomain = window.location.origin;
         const addonUrl = `${currentDomain}/manifest.json`;
-        const stremioInstallUrl = `stremio://${addonUrl}`;
+        const stremioInstallUrl = `stremio://https:${addonUrl.split('https:')[1]}`;
+
+        // Set the install button URL
+        document.getElementById('installBtn').href = stremioInstallUrl;
 
         // Set the install button URL
         document.getElementById('installBtn').href = stremioInstallUrl;
