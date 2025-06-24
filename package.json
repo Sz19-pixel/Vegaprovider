@@ -6,8 +6,7 @@
   "main": "api/index.js",
   "scripts": {
     "dev": "vercel dev",
-    "build": "vercel build",
-    "deploy": "vercel deploy"
+    "start": "node api/index.js"
   },
   "dependencies": {
     "stremio-addon-sdk": "^1.6.8",
