@@ -342,22 +342,18 @@ builder.defineStreamHandler(async (args) => {
     return { streams };
 });
 
-const { handler } = builder.getInterface();
+const interface = builder.getInterface();
 
-module.exports = async (req, res) => {
+module.exports = (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
-        res.status(200).end();
+        res.writeHead(200);
+        res.end();
         return;
     }
 
-    try {
-        await handler(req, res);
-    } catch (error) {
-        console.error('Error handling request:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+    interface.middleware(req, res);
 };
