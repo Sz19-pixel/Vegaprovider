@@ -13,7 +13,7 @@ const manifest = {
     resources: ['stream'],
     types: ['movie', 'series'],
     idPrefixes: ['tt', 'tmdb:'],
-    catalog: [],
+    catalogs: [],
     behaviorHints: {
         configurable: true,
         configurationRequired: false
