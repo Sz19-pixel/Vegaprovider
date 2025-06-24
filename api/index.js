@@ -1,4 +1,4 @@
-// api/index.js - Optimized Multi-Source Streaming Addon for Vercel
+// api/index.js - Fixed Multi-Source Streaming Addon for Vercel
 import { addonBuilder } from 'stremio-addon-sdk';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
@@ -502,6 +502,24 @@ builder.defineStreamHandler(async (args) => {
 // Get addon interface
 const addonInterface = builder.getInterface();
 
+// Helper function to parse URL path and extract route info
+function parseAddonRoute(url) {
+    const path = url.replace(/^\/+/, ''); // Remove leading slashes
+    const parts = path.split('/');
+    
+    if (parts[0] === 'manifest.json' || parts.length === 1) {
+        return { type: 'manifest' };
+    }
+    
+    if (parts[0] === 'stream' && parts.length >= 3) {
+        const contentType = parts[1];
+        const id = parts[2];
+        return { type: 'stream', contentType, id };
+    }
+    
+    return { type: 'unknown' };
+}
+
 // Vercel serverless function handler
 export default async (req, res) => {
     // Performance and security headers
@@ -518,19 +536,49 @@ export default async (req, res) => {
     }
     
     try {
-        const result = await addonInterface(req);
+        const route = parseAddonRoute(req.url);
         
-        if (result && typeof result === 'object') {
+        if (route.type === 'manifest') {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).json(manifest);
+            return;
+        }
+        
+        if (route.type === 'stream') {
+            const result = await builder.streamHandler({ 
+                type: route.contentType, 
+                id: route.id 
+            });
+            
             res.setHeader('Content-Type', 'application/json');
             res.status(200).json(result);
-        } else {
-            res.status(404).json({ error: 'Not found' });
+            return;
         }
+        
+        // Default fallback - try to handle with addon interface
+        if (typeof addonInterface === 'function') {
+            const result = await addonInterface(req);
+            if (result && typeof result === 'object') {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200).json(result);
+                return;
+            }
+        }
+        
+        // If we get here, route not found
+        res.status(404).json({ 
+            error: 'Route not found',
+            availableRoutes: [
+                '/manifest.json',
+                '/stream/{type}/{id}'
+            ]
+        });
+        
     } catch (error) {
         console.error('Request handler error:', error);
         res.status(500).json({ 
             error: 'Internal Server Error',
-            message: process.env.NODE_ENV === 'development' ? error.message : undefined
+            message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
         });
     }
 };
