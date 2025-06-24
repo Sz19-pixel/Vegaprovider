@@ -394,7 +394,7 @@ builder.defineStreamHandler(async (args) => {
 const addonInterface = builder.getInterface();
 
 // Vercel serverless function handler
-export default async (req, res) => {
+module.exports = async (req, res) => {
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
