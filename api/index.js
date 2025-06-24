@@ -1,9 +1,7 @@
-
-// index.js - Main Stremio Addon
+// api/index.js - Vercel API Route
 const { addonBuilder } = require('stremio-addon-sdk');
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { URLSearchParams } = require('url');
 
 // Addon manifest
 const manifest = {
@@ -293,7 +291,6 @@ async function getStreams(id) {
                         if (linkUrl) {
                             try {
                                 const linkResponse = await axios.get(linkUrl, { headers, timeout: 10000 });
-                                const link$ = cheerio.load(linkResponse.data);
                                 
                                 // Extract various streaming links
                                 const vcloudRegex = /https:\/\/vcloud\.lol\/[^\s"]+/g;
@@ -394,4 +391,32 @@ builder.defineStreamHandler(async (args) => {
     return { streams };
 });
 
-module.exports = builder.getInterface();
+const addonInterface = builder.getInterface();
+
+// Vercel serverless function handler
+module.exports = async (req, res) => {
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+    
+    try {
+        const result = await addonInterface(req);
+        
+        // Set content type for JSON responses
+        if (result && typeof result === 'object') {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).json(result);
+        } else {
+            res.status(404).json({ error: 'Not found' });
+        }
+    } catch (error) {
+        console.error('Error handling request:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
