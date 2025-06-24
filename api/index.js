@@ -1,7 +1,7 @@
 // api/index.js - Optimized Multi-Source Streaming Addon for Vercel
-const { addonBuilder } = require('stremio-addon-sdk');
-const axios = require('axios');
-const cheerio = require('cheerio');
+import { addonBuilder } from 'stremio-addon-sdk';
+import axios from 'axios';
+import * as cheerio from 'cheerio';
 
 // Addon manifest
 const manifest = {
