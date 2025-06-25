@@ -304,6 +304,41 @@
             box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
         }
 
+        .install-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .install-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .install-btn-primary {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .install-btn-secondary {
+            background: linear-gradient(45deg, #0984e3, #74b9ff);
+            color: white;
+        }
+
+        .install-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
         .notification {
             position: fixed;
             top: 20px;
@@ -320,6 +355,45 @@
 
         .notification.show {
             transform: translateX(0);
+        }
+
+        .quick-install {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .quick-install h2 {
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .quick-install p {
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .quick-install-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #00b894, #00a085);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .quick-install-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 184, 148, 0.4);
         }
 
         @media (max-width: 768px) {
@@ -352,6 +426,14 @@
             .radio-group {
                 flex-direction: column;
             }
+
+            .install-buttons {
+                flex-direction: column;
+            }
+
+            .install-btn {
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -360,6 +442,15 @@
         <div class="header">
             <h1>🎬 Configure Multi-Source Streams Pro</h1>
             <p>Customize your streaming experience with advanced settings</p>
+        </div>
+
+        <!-- Quick Install Section -->
+        <div class="quick-install">
+            <h2>⚡ Quick Install (Default Settings)</h2>
+            <p>Want to install with default settings right away? Click the button below!</p>
+            <a href="https://newmultisrc.vercel.app/manifest.json" class="quick-install-btn">
+                🚀 Install Now with Default Settings
+            </a>
         </div>
 
         <form class="config-form" id="configForm">
@@ -504,10 +595,15 @@
         <div class="preview-section" id="previewSection" style="display: none;">
             <h3>📋 Your Configured Addon URL</h3>
             <div class="preview-url" id="previewUrl"></div>
-            <button class="copy-btn" onclick="copyConfigUrl()">📋 Copy URL</button>
-            <button class="copy-btn" onclick="installAddon()" style="margin-left: 10px; background: linear-gradient(45deg, #ff6b6b, #ee5a24);">
-                📱 Install in Stremio
-            </button>
+            <div class="install-buttons">
+                <button class="copy-btn" onclick="copyConfigUrl()">📋 Copy URL</button>
+                <a href="#" id="stremioInstallLink" class="install-btn install-btn-primary">
+                    📱 Install in Stremio
+                </a>
+                <button class="install-btn install-btn-secondary" onclick="openInNewTab()">
+                    🌐 Open in Browser
+                </button>
+            </div>
         </div>
     </div>
 
@@ -660,10 +756,17 @@
             // Build URL parameters
             const params = new URLSearchParams(config);
             const baseUrl = 'https://newmultisrc.vercel.app';
-            configUrl = `${baseUrl}/manifest.json?${params.toString()}`;
+            
+            // Ensure the URL ends with /manifest.json
+            if (params.toString()) {
+                configUrl = `${baseUrl}/manifest.json?${params.toString()}`;
+            } else {
+                configUrl = `${baseUrl}/manifest.json`;
+            }
 
             // Show preview
             document.getElementById('previewUrl').textContent = configUrl;
+            document.getElementById('stremioInstallLink').href = configUrl;
             document.getElementById('previewSection').style.display = 'block';
 
             // Scroll to preview
@@ -702,22 +805,14 @@
             }
         }
 
-        function installAddon() {
+        function openInNewTab() {
             if (!configUrl) {
                 showNotification('Please generate configuration first');
                 return;
             }
-
-            // Create Stremio install URL
-            const stremioUrl = configUrl.replace('https://', 'stremio://');
             
-            // Try to open Stremio
-            window.location.href = stremioUrl;
-            
-            // Fallback message
-            setTimeout(() => {
-                showNotification('If Stremio didn\'t open, copy the URL and paste it in Stremio manually');
-            }, 2000);
+            window.open(configUrl, '_blank');
+            showNotification('Opening addon manifest in new tab');
         }
 
         function showNotification(message) {
