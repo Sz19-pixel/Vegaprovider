@@ -466,10 +466,16 @@ export default async (req, res) => {
                 id: route.id
             });
             
-            const result = await builder.streamHandler({ 
-                type: route.contentType, 
-                id: route.id 
-            });
+            const addonInterface = builder.getInterface();
+
+if (typeof addonInterface['stream'] !== 'function') {
+    throw new Error('Stream handler is not defined correctly.');
+}
+
+const result = await addonInterface['stream']({
+    type: route.contentType,
+    id: route.id
+});
             
             res.setHeader('Content-Type', 'application/json');
             res.status(200).json(result);
