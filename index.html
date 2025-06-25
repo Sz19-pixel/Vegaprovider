@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configure Multi-Source Streams Pro</title>
-    <meta name="description" content="Configure your streaming preferences for Multi-Source Streams Pro addon">
+    <title>Multi-Source Streams Pro - Stremio Addon</title>
+    <meta name="description" content="Advanced streaming addon with multiple sources and quality detection for Stremio">
     <link rel="icon" href="https://i.imgur.com/5QjNvzO.png" type="image/png">
     
     <style>
@@ -19,326 +19,364 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #fff;
-            padding: 20px;
+            overflow-x: hidden;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 0 20px;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 30px;
+        /* Header */
+        header {
+            padding: 20px 0;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo img {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 5rem);
+            margin-bottom: 20px;
             background: linear-gradient(45deg, #fff, #ffd700);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
         }
 
-        .header p {
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3)); }
+            to { filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.6)); }
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
             opacity: 0.9;
-            font-size: 1.1rem;
+            line-height: 1.6;
         }
 
-        .config-form {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            margin-bottom: 30px;
-        }
-
-        .form-section {
-            margin-bottom: 35px;
-        }
-
-        .form-section h3 {
-            font-size: 1.4rem;
-            margin-bottom: 20px;
-            color: #ffd700;
-            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
-            padding-bottom: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #fff;
-        }
-
-        .form-description {
-            font-size: 0.9rem;
-            opacity: 0.7;
-            margin-bottom: 10px;
-            line-height: 1.4;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        select:focus {
-            outline: none;
-            border-color: #ffd700;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-        }
-
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .checkbox-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 10px;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .checkbox-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 215, 0, 0.3);
-        }
-
-        .checkbox-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            margin-right: 12px;
-            cursor: pointer;
-        }
-
-        .checkbox-item.checked {
-            border-color: #ffd700;
-            background: rgba(255, 215, 0, 0.1);
-        }
-
-        .radio-group {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-
-        .radio-item {
-            display: flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 12px 20px;
-            border-radius: 25px;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .radio-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .radio-item input[type="radio"] {
-            margin-right: 10px;
-            cursor: pointer;
-        }
-
-        .radio-item.selected {
-            border-color: #ffd700;
-            background: rgba(255, 215, 0, 0.1);
-        }
-
-        .range-group {
-            margin-top: 10px;
-        }
-
-        .range-input {
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(255, 255, 255, 0.2);
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        .range-input::-webkit-slider-thumb {
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #ffd700;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        }
-
-        .range-input::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #ffd700;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        }
-
-        .range-value {
-            text-align: center;
-            margin-top: 10px;
-            font-weight: bold;
-            color: #ffd700;
-        }
-
-        .buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 40px;
-        }
-
-        .btn {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 25px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
-            color: white;
-            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.5);
-        }
-
-        .preview-section {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 30px;
-        }
-
-        .preview-section h3 {
-            color: #ffd700;
-            margin-bottom: 15px;
-        }
-
-        .preview-url {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            font-family: monospace;
-            word-break: break-all;
-            font-size: 0.9rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .copy-btn {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: linear-gradient(45deg, #00b894, #00a085);
-            color: white;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .copy-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
-        }
-
-        .install-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
+        /* Install Button */
+        .install-section {
+            margin: 50px 0;
         }
 
         .install-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-        }
-
-        .install-btn-primary {
+            gap: 15px;
             background: linear-gradient(45deg, #ff6b6b, #ee5a24);
             color: white;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+            position: relative;
+            overflow: hidden;
         }
 
-        .install-btn-secondary {
-            background: linear-gradient(45deg, #0984e3, #74b9ff);
-            color: white;
+        .install-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .install-btn:hover::before {
+            left: 100%;
         }
 
         .install-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
         }
 
+        .install-btn:active {
+            transform: translateY(-2px);
+        }
+
+        .install-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ffd700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        /* Installation Guide */
+        .guide {
+            padding: 100px 0;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .guide h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .step h3 {
+            margin: 20px 0 15px;
+            font-size: 1.3rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .social-links a {
+            color: #fff;
+            text-decoration: none;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .social-links a:hover {
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero {
+                padding: 60px 0;
+            }
+            
+            .install-btn {
+                padding: 15px 30px;
+                font-size: 1.1rem;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feature-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.4s; }
+
+        /* Notification */
         .notification {
             position: fixed;
             top: 20px;
@@ -356,465 +394,204 @@
         .notification.show {
             transform: translateX(0);
         }
-
-        .quick-install {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .quick-install h2 {
-            color: #ffd700;
-            margin-bottom: 15px;
-        }
-
-        .quick-install p {
-            margin-bottom: 20px;
-            opacity: 0.9;
-        }
-
-        .quick-install-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 15px 30px;
-            background: linear-gradient(45deg, #00b894, #00a085);
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .quick-install-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(0, 184, 148, 0.4);
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 10px;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .config-form {
-                padding: 25px;
-            }
-            
-            .buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .checkbox-group {
-                grid-template-columns: 1fr;
-            }
-            
-            .radio-group {
-                flex-direction: column;
-            }
-
-            .install-buttons {
-                flex-direction: column;
-            }
-
-            .install-btn {
-                justify-content: center;
-            }
-        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🎬 Configure Multi-Source Streams Pro</h1>
-            <p>Customize your streaming experience with advanced settings</p>
-        </div>
+    <header>
+        <nav class="container">
+            <div class="logo">
+                <img src="https://i.imgur.com/5QjNvzO.png" alt="Multi-Source Streams Pro">
+                <span>Multi-Source Streams Pro</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#guide">Install Guide</a></li>
+                <li><a href="#stats">Stats</a></li>
+            </ul>
+        </nav>
+    </header>
 
-        <!-- Quick Install Section -->
-        <div class="quick-install">
-            <h2>⚡ Quick Install (Default Settings)</h2>
-            <p>Want to install with default settings right away? Click the button below!</p>
-            <a href="https://newmultisrc.vercel.app/manifest.json" class="quick-install-btn">
-                🚀 Install Now with Default Settings
-            </a>
-        </div>
-
-        <form class="config-form" id="configForm">
-            <!-- Source Selection -->
-            <div class="form-section">
-                <h3>🎯 Streaming Sources</h3>
-                <div class="form-group">
-                    <label>Select your preferred streaming sources:</label>
-                    <div class="form-description">Choose which sources to use for finding streams. More sources = better availability but slower response times.</div>
-                    <div class="checkbox-group" id="sourcesGroup">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="vidsrc" name="sources" value="vidsrc" checked>
-                            <label for="vidsrc">VidSrc Pro</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="embed2" name="sources" value="2embed" checked>
-                            <label for="embed2">2Embed</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="superembed" name="sources" value="superembed" checked>
-                            <label for="superembed">SuperEmbed</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="embedsu" name="sources" value="embedsu">
-                            <label for="embedsu">EmbedSu</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="doodstream" name="sources" value="doodstream">
-                            <label for="doodstream">DoodStream</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="upstream" name="sources" value="upstream">
-                            <label for="upstream">UpStream</label>
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Stream Everything</h1>
+                    <p>The ultimate Stremio addon with multiple streaming sources, automatic quality detection, and lightning-fast performance. Access thousands of movies and TV shows with a single click.</p>
+                    
+                    <div class="install-section">
+                        <a href="#" class="install-btn" id="installBtn">
+                            <svg class="install-icon" viewBox="0 0 24 24">
+                                <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
+                            </svg>
+                            Install Addon
+                        </a>
+                    </div>
+                    
+                    <div class="stats">
+                        <div class="container">
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-number">5+</span>
+                                    <div class="stat-label">Streaming Sources</div>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number">4K</span>
+                                    <div class="stat-label">Max Quality</div>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number">∞</span>
+                                    <div class="stat-label">Movies & Tv Shows</div>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number">⚡</span>
+                                    <div class="stat-label">Lightning Fast</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Quality Preferences -->
-            <div class="form-section">
-                <h3>📺 Quality Settings</h3>
-                <div class="form-group">
-                    <label>Preferred Quality:</label>
-                    <div class="form-description">Select your preferred streaming quality. Higher quality requires more bandwidth.</div>
-                    <div class="radio-group" id="qualityGroup">
-                        <div class="radio-item">
-                            <input type="radio" id="quality_auto" name="quality" value="auto" checked>
-                            <label for="quality_auto">Auto (Best Available)</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="quality_4k" name="quality" value="4k">
-                            <label for="quality_4k">4K UHD</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="quality_1080p" name="quality" value="1080p">
-                            <label for="quality_1080p">1080p FHD</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="quality_720p" name="quality" value="720p">
-                            <label for="quality_720p">720p HD</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="quality_480p" name="quality" value="480p">
-                            <label for="quality_480p">480p SD</label>
-                        </div>
+        <section class="features" id="features">
+            <div class="container">
+                <h2>Powerful Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🎬</div>
+                        <h3>Multiple Sources</h3>
+                        <p>Access content from 5+ premium streaming sources including VidSrc Pro, 2Embed, and more for maximum availability.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Lightning Fast</h3>
+                        <p>Optimized parallel processing and smart caching ensure you get your streams in seconds, not minutes.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3>Quality Detection</h3>
+                        <p>Automatic quality detection from 360p to 4K UHD, so you always know what you're getting.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <h3>Secure & Safe</h3>
+                        <p>Built with security in mind, featuring proper headers and no malicious redirects.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <h3>Cross Platform</h3>
+                        <p>Works seamlessly on desktop, mobile, and TV devices through the Stremio app.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🆓</div>
+                        <h3>Completely Free</h3>
+                        <p>No subscriptions, no ads, no hidden costs. Just pure streaming convenience.</p>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Performance Settings -->
-            <div class="form-section">
-                <h3>⚡ Performance Settings</h3>
-                <div class="form-group">
-                    <label for="timeout">Request Timeout (seconds):</label>
-                    <div class="form-description">How long to wait for each source before giving up. Higher values = more results but slower response.</div>
-                    <div class="range-group">
-                        <input type="range" id="timeout" name="timeout" min="5" max="30" value="15" class="range-input">
-                        <div class="range-value" id="timeoutValue">15 seconds</div>
+        <section class="guide" id="guide">
+            <div class="container">
+                <h2>Installation Guide</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Install Stremio</h3>
+                        <p>Download and install the Stremio app on your device from the official website.</p>
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="maxStreams">Maximum Streams per Source:</label>
-                    <div class="form-description">Limit the number of streams returned by each source to improve performance.</div>
-                    <div class="range-group">
-                        <input type="range" id="maxStreams" name="maxStreams" min="1" max="20" value="10" class="range-input">
-                        <div class="range-value" id="maxStreamsValue">10 streams</div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Click Install</h3>
+                        <p>Click the "Install Addon" button above to open the addon in Stremio.</p>
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="concurrent">Concurrent Extractions:</label>
-                    <div class="form-description">How many sources to check simultaneously. Higher values = faster but more resource intensive.</div>
-                    <div class="range-group">
-                        <input type="range" id="concurrent" name="concurrent" min="1" max="10" value="5" class="range-input">
-                        <div class="range-value" id="concurrentValue">5 sources</div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Confirm Installation</h3>
+                        <p>Stremio will ask for confirmation. Click "Install" to add the addon to your library.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <h3>Start Streaming</h3>
+                        <p>Browse movies and TV shows. The addon will automatically provide streaming links.</p>
                     </div>
                 </div>
             </div>
+        </section>
+    </main>
 
-            <!-- Advanced Settings -->
-            <div class="form-section">
-                <h3>🔧 Advanced Options</h3>
-                <div class="form-group">
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="filterDuplicates" name="filterDuplicates" checked>
-                            <label for="filterDuplicates">Filter Duplicate Streams</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="sortByQuality" name="sortByQuality" checked>
-                            <label for="sortByQuality">Sort by Quality</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="enableDebug" name="enableDebug">
-                            <label for="enableDebug">Enable Debug Mode</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="fallbackStreams" name="fallbackStreams" checked>
-                            <label for="fallbackStreams">Include Fallback Streams</label>
-                        </div>
-                    </div>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <p>&copy; 2025 Multi-Source Streams Pro. Built for Stremio users worldwide.</p>
                 </div>
-
-                <div class="form-group">
-                    <label for="userAgent">Custom User Agent (Optional):</label>
-                    <div class="form-description">Override the default browser user agent for source requests.</div>
-                    <input type="text" id="userAgent" name="userAgent" placeholder="Leave empty for default">
+                <div class="social-links">
+                    <a href="#" onclick="copyLink()">Share</a>
+                    <a href="#" onclick="reportIssue()">Report Issue</a>
+                    <a href="#features">Features</a>
                 </div>
-            </div>
-
-            <div class="buttons">
-                <button type="button" class="btn btn-secondary" onclick="resetConfig()">
-                    🔄 Reset to Default
-                </button>
-                <button type="button" class="btn btn-primary" onclick="generateConfig()">
-                    🚀 Generate Install URL
-                </button>
-            </div>
-        </form>
-
-        <div class="preview-section" id="previewSection" style="display: none;">
-            <h3>📋 Your Configured Addon URL</h3>
-            <div class="preview-url" id="previewUrl"></div>
-            <div class="install-buttons">
-                <button class="copy-btn" onclick="copyConfigUrl()">📋 Copy URL</button>
-                <a href="#" id="stremioInstallLink" class="install-btn install-btn-primary">
-                    📱 Install in Stremio
-                </a>
-                <button class="install-btn install-btn-secondary" onclick="openInNewTab()">
-                    🌐 Open in Browser
-                </button>
             </div>
         </div>
-    </div>
+    </footer>
 
     <!-- Notification -->
     <div class="notification" id="notification">
-        Configuration saved successfully!
+        Addon link copied to clipboard!
     </div>
 
     <script>
-        let configUrl = '';
+        // Get the correct domain and manifest URL
+        const manifestUrl = `${window.location.origin}/manifest.json`;
+        const stremioInstallUrl = `stremio://${window.location.host}/manifest.json`;
 
-        // Initialize form interactions
-        document.addEventListener('DOMContentLoaded', function() {
-            // Checkbox interactions
-            document.querySelectorAll('.checkbox-item').forEach(item => {
-                const checkbox = item.querySelector('input[type="checkbox"]');
-                
-                item.addEventListener('click', function(e) {
-                    if (e.target !== checkbox) {
-                        checkbox.checked = !checkbox.checked;
-                    }
-                    updateCheckboxState(item, checkbox.checked);
-                });
-                
-                checkbox.addEventListener('change', function() {
-                    updateCheckboxState(item, this.checked);
-                });
-                
-                // Initialize state
-                updateCheckboxState(item, checkbox.checked);
-            });
+        console.log('Manifest URL:', manifestUrl);
+        console.log('Stremio Install URL:', stremioInstallUrl);
 
-            // Radio button interactions
-            document.querySelectorAll('.radio-item').forEach(item => {
-                const radio = item.querySelector('input[type="radio"]');
-                
-                item.addEventListener('click', function(e) {
-                    if (e.target !== radio) {
-                        radio.checked = true;
-                        updateRadioStates(radio.name);
-                    }
-                });
-                
-                radio.addEventListener('change', function() {
-                    if (this.checked) {
-                        updateRadioStates(this.name);
-                    }
-                });
-            });
+        // Set the install button URL
+        document.getElementById('installBtn').href = stremioInstallUrl;
 
-            // Range input interactions
-            setupRangeInput('timeout', 'timeoutValue', (val) => `${val} seconds`);
-            setupRangeInput('maxStreams', 'maxStreamsValue', (val) => `${val} streams`);
-            setupRangeInput('concurrent', 'concurrentValue', (val) => `${val} sources`);
-
-            // Initialize radio states
-            updateRadioStates('quality');
+        // Install button click handler
+        document.getElementById('installBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Try to open Stremio app first
+            window.location.href = stremioInstallUrl;
+            
+            // Fallback: copy link and show instructions
+            setTimeout(() => {
+                copyToClipboard(manifestUrl);
+                showNotification('Addon link copied! Paste it in Stremio if the app didn\'t open.');
+            }, 1000);
         });
 
-        function updateCheckboxState(item, checked) {
-            if (checked) {
-                item.classList.add('checked');
-            } else {
-                item.classList.remove('checked');
-            }
+        // Copy link function
+        function copyLink() {
+            copyToClipboard(manifestUrl);
+            showNotification('Addon link copied to clipboard!');
         }
 
-        function updateRadioStates(groupName) {
-            document.querySelectorAll(`input[name="${groupName}"]`).forEach(radio => {
-                const item = radio.closest('.radio-item');
-                if (radio.checked) {
-                    item.classList.add('selected');
-                } else {
-                    item.classList.remove('selected');
-                }
-            });
-        }
-
-        function setupRangeInput(inputId, valueId, formatter) {
-            const input = document.getElementById(inputId);
-            const valueDisplay = document.getElementById(valueId);
-            
-            input.addEventListener('input', function() {
-                valueDisplay.textContent = formatter(this.value);
-            });
-        }
-
-        function resetConfig() {
-            // Reset checkboxes
-            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-                const defaultChecked = ['vidsrc', '2embed', 'superembed', 'filterDuplicates', 'sortByQuality', 'fallbackStreams'];
-                cb.checked = defaultChecked.includes(cb.id);
-                updateCheckboxState(cb.closest('.checkbox-item'), cb.checked);
-            });
-
-            // Reset radio buttons
-            document.getElementById('quality_auto').checked = true;
-            updateRadioStates('quality');
-
-            // Reset ranges
-            document.getElementById('timeout').value = 15;
-            document.getElementById('maxStreams').value = 10;
-            document.getElementById('concurrent').value = 5;
-            
-            // Update range displays
-            document.getElementById('timeoutValue').textContent = '15 seconds';
-            document.getElementById('maxStreamsValue').textContent = '10 streams';
-            document.getElementById('concurrentValue').textContent = '5 sources';
-
-            // Reset text inputs
-            document.getElementById('userAgent').value = '';
-
-            // Hide preview
-            document.getElementById('previewSection').style.display = 'none';
-
-            showNotification('Configuration reset to default values');
-        }
-
-        function generateConfig() {
-            const form = document.getElementById('configForm');
-            const formData = new FormData(form);
-            
-            // Get selected sources
-            const sources = [];
-            document.querySelectorAll('input[name="sources"]:checked').forEach(cb => {
-                sources.push(cb.value);
-            });
-
-            // Build configuration object
-            const config = {
-                sources: sources.join(','),
-                quality: formData.get('quality') || 'auto',
-                timeout: parseInt(formData.get('timeout')) || 15,
-                maxStreams: parseInt(formData.get('maxStreams')) || 10,
-                concurrent: parseInt(formData.get('concurrent')) || 5,
-                filterDuplicates: document.getElementById('filterDuplicates').checked ? '1' : '0',
-                sortByQuality: document.getElementById('sortByQuality').checked ? '1' : '0',
-                enableDebug: document.getElementById('enableDebug').checked ? '1' : '0',
-                fallbackStreams: document.getElementById('fallbackStreams').checked ? '1' : '0',
-                userAgent: formData.get('userAgent') || ''
-            };
-
-            // Remove empty values
-            Object.keys(config).forEach(key => {
-                if (config[key] === '' || config[key] === null) {
-                    delete config[key];
-                }
-            });
-
-            // Build URL parameters
-            const params = new URLSearchParams(config);
-            const baseUrl = 'https://newmultisrc.vercel.app';
-            
-            // Ensure the URL ends with /manifest.json
-            if (params.toString()) {
-                configUrl = `${baseUrl}/manifest.json?${params.toString()}`;
-            } else {
-                configUrl = `${baseUrl}/manifest.json`;
-            }
-
-            // Show preview
-            document.getElementById('previewUrl').textContent = configUrl;
-            document.getElementById('stremioInstallLink').href = configUrl;
-            document.getElementById('previewSection').style.display = 'block';
-
-            // Scroll to preview
-            document.getElementById('previewSection').scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-            });
-
-            showNotification('Configuration generated successfully!');
-        }
-
-        function copyConfigUrl() {
-            if (!configUrl) {
-                showNotification('Please generate configuration first');
-                return;
-            }
-
+        // Copy to clipboard helper
+        function copyToClipboard(text) {
             if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(configUrl).then(() => {
-                    showNotification('Configuration URL copied to clipboard!');
-                });
+                navigator.clipboard.writeText(text);
             } else {
                 // Fallback for older browsers
                 const textArea = document.createElement('textarea');
-                textArea.value = configUrl;
+                textArea.value = text;
                 document.body.appendChild(textArea);
                 textArea.focus();
                 textArea.select();
                 try {
                     document.execCommand('copy');
-                    showNotification('Configuration URL copied to clipboard!');
                 } catch (err) {
-                    showNotification('Failed to copy URL - please copy manually');
+                    console.error('Unable to copy to clipboard', err);
                 }
                 document.body.removeChild(textArea);
             }
         }
 
-        function openInNewTab() {
-            if (!configUrl) {
-                showNotification('Please generate configuration first');
-                return;
-            }
-            
-            window.open(configUrl, '_blank');
-            showNotification('Opening addon manifest in new tab');
-        }
-
+        // Show notification
         function showNotification(message) {
             const notification = document.getElementById('notification');
             notification.textContent = message;
@@ -822,12 +599,66 @@
             
             setTimeout(() => {
                 notification.classList.remove('show');
-            }, 4000);
+            }, 3000);
         }
 
+        // Report issue function
+        function reportIssue() {
+            const subject = encodeURIComponent('Multi-Source Streams Pro - Issue Report');
+            const body = encodeURIComponent(`Please describe the issue you're experiencing with the Multi-Source Streams Pro addon:\n\nAddon URL: ${manifestUrl}\nBrowser: ${navigator.userAgent}\n\nIssue Description:\n`);
+            
+            // You can replace this with your actual support email
+            window.open(`mailto:support@example.com?subject=${subject}&body=${body}`);
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add loading animation to install button
+        document.getElementById('installBtn').addEventListener('click', function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = `
+                <svg class="install-icon" viewBox="0 0 24 24" style="animation: spin 1s linear infinite;">
+                    <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" />
+                </svg>
+                Opening Stremio...
+            `;
+            
+            btn.style.pointerEvents = 'none';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.pointerEvents = 'auto';
+            }, 3000);
+        });
+
+        // Add CSS for spinning animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+
         // Console welcome message
-        console.log('%c🎬 Multi-Source Streams Pro Configuration', 'color: #667eea; font-size: 18px; font-weight: bold;');
-        console.log('%cCustomize your streaming experience!', 'color: #764ba2; font-size: 14px;');
+        console.log('%c🎬 Multi-Source Streams Pro', 'color: #667eea; font-size: 20px; font-weight: bold;');
+        console.log('%cAddon URL: ' + manifestUrl, 'color: #764ba2; font-size: 14px;');
+        console.log('%cFor support, please use the Report Issue button', 'color: #666; font-size: 12px;');
     </script>
 </body>
 </html>
